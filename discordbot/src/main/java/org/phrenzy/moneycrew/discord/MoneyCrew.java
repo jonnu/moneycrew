@@ -19,7 +19,7 @@ public class MoneyCrew {
         MessageListener<DiscordApi> listener = injector.getInstance(Key.get(new TypeLiteral<MessageListener<DiscordApi>>() {}));
 
         // Read the token from the first program parameter when invoking the bot
-        String token = args[0];
+        String token = args[0].substring(args[0].indexOf('=') + 1);
 
         new DiscordApiBuilder()
                 .setToken(token)

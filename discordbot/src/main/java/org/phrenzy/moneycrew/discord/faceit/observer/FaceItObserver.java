@@ -3,7 +3,6 @@ package org.phrenzy.moneycrew.discord.faceit.observer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.sun.istack.internal.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -81,7 +80,6 @@ public class FaceItObserver implements MessageEventObserver<DiscordApi> {
         }
     }
 
-    @Nullable
     private static <T> T safelyMapStreamToClass(final InputStream stream, final Class<T> clazz) {
         try {
             return MAPPER.readValue(stream, clazz);
