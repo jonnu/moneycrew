@@ -60,4 +60,4 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: moneycrew
           cluster: arn:aws:ecs:eu-west-1:638046407217:cluster/moneycrew
-          wait-for-service-stability: true
+          wait-for-service-stability: false

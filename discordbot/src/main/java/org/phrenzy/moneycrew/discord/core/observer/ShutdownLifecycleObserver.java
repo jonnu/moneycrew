@@ -4,7 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 
-public class LifecycleObserver implements MessageEventObserver<DiscordApi> {
+public class ShutdownLifecycleObserver implements MessageEventObserver<DiscordApi> {
 
     @Override
     public boolean canHandle(final String message) {

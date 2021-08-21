@@ -5,7 +5,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.javacord.api.DiscordApi;
-import org.phrenzy.moneycrew.discord.core.observer.LifecycleObserver;
+import org.phrenzy.moneycrew.discord.core.observer.ShutdownLifecycleObserver;
+import org.phrenzy.moneycrew.discord.core.observer.StatusObserver;
 import org.phrenzy.moneycrew.discord.faceit.observer.FaceItObserver;
 import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 import org.phrenzy.moneycrew.discord.core.observer.PingObserver;
@@ -28,8 +29,9 @@ public class DiscordModule extends AbstractModule {
     @Provides
     public Set<MessageEventObserver<DiscordApi>> bindAllMessageEventObservers(final ScrimStorage scrimStorage) {
         return ImmutableSet.of(
+                new ShutdownLifecycleObserver(),
                 new PingObserver(),
-                new LifecycleObserver(),
+                new StatusObserver(),
                 new ScrimObserver(scrimStorage),
                 new FaceItObserver()
         );
