@@ -14,6 +14,7 @@ import org.phrenzy.moneycrew.discord.scrim.service.MessageListener;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 public class MoneyCrew {
 
@@ -23,7 +24,7 @@ public class MoneyCrew {
     public static void main(final String[] args) {
 
         final Injector injector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(new DiscordModule()));
-        final MessageListener<DiscordApi> listener = injector.getInstance(Key.get(new TypeLiteral<MessageListener<DiscordApi>>() {}));
+        final Set<MessageListener<DiscordApi>> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<MessageListener<DiscordApi>>>() {}));
 
         // Read the token from env (or the first program parameter) when invoking the bot.
         final String token = getTokenFromEnvironment()
@@ -33,7 +34,7 @@ public class MoneyCrew {
         new DiscordApiBuilder()
                 .setToken(token)
                 .login()
-                .thenAccept(listener::bindListeners)
+                .thenAccept(api -> listeners.forEach(listener -> listener.bindListeners(api)))
                 .exceptionally(ExceptionLogger.get());
     }
 
