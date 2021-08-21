@@ -8,7 +8,6 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
-
 group 'org.phrenzy'
 version '1.0-SNAPSHOT'
 
@@ -36,5 +35,12 @@ test {
     useJUnit()
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Title": "Gradle",
+                "Implementation-Version": archiveVersion)
     }
 }
