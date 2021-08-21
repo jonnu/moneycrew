@@ -10,7 +10,7 @@ import org.phrenzy.moneycrew.discord.scrim.service.MessageListener;
 
 public class MoneyCrew {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         Injector injector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(
                 new DiscordModule()
