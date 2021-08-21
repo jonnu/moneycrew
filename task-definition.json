@@ -5,7 +5,14 @@
     {
       "dnsSearchDomains": null,
       "environmentFiles": null,
-      "logConfiguration": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "awslogs-moneycrew",
+          "awslogs-region": "eu-west-1",
+          "awslogs-stream-prefix": "awslogs-moneycrew"
+        }
+      },
       "entryPoint": null,
       "portMappings": [
         {
