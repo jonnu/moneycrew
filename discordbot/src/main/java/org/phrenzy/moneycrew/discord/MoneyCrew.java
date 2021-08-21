@@ -25,7 +25,8 @@ public class MoneyCrew {
                 .setToken(token)
                 .login()
                 .thenAccept(listener::bindListeners)
-                .exceptionally(ExceptionLogger.get());
+                .exceptionally(ExceptionLogger.get())
+                .join();
     }
 
 }

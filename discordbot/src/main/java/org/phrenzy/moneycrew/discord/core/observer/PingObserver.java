@@ -1,4 +1,4 @@
-package org.phrenzy.moneycrew.discord.scrim.observer;
+package org.phrenzy.moneycrew.discord.core.observer;
 
 import com.google.inject.Inject;
 import org.javacord.api.DiscordApi;

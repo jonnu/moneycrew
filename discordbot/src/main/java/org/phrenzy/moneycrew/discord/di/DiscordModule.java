@@ -5,9 +5,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.javacord.api.DiscordApi;
+import org.phrenzy.moneycrew.discord.core.observer.LifecycleObserver;
 import org.phrenzy.moneycrew.discord.faceit.observer.FaceItObserver;
 import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
-import org.phrenzy.moneycrew.discord.scrim.observer.PingObserver;
+import org.phrenzy.moneycrew.discord.core.observer.PingObserver;
 import org.phrenzy.moneycrew.discord.scrim.observer.ScrimObserver;
 import org.phrenzy.moneycrew.discord.scrim.service.MessageListener;
 import org.phrenzy.moneycrew.discord.scrim.service.TextMessageListener;
@@ -28,6 +29,7 @@ public class DiscordModule extends AbstractModule {
     public Set<MessageEventObserver<DiscordApi>> bindAllMessageEventObservers(final ScrimStorage scrimStorage) {
         return ImmutableSet.of(
                 new PingObserver(),
+                new LifecycleObserver(),
                 new ScrimObserver(scrimStorage),
                 new FaceItObserver()
         );

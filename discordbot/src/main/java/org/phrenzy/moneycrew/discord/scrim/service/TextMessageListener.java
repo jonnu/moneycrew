@@ -2,10 +2,12 @@ package org.phrenzy.moneycrew.discord.scrim.service;
 
 import com.google.inject.Inject;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
 
 import java.util.Set;
 
+@Log4j2
 @AllArgsConstructor(onConstructor = @__(@Inject))
 public class TextMessageListener implements MessageListener<DiscordApi> {
 
@@ -18,7 +20,13 @@ public class TextMessageListener implements MessageListener<DiscordApi> {
         api.addMessageCreateListener(event -> {
 
             final String message = event.getMessage().getContent().toLowerCase();
-            System.out.println("Rec: " + message);
+
+            if (event.getMessageAuthor().isYourself()) {
+                log.info("message (from self): {}", message);
+                return;
+            }
+
+            log.info("message: {}", message);
 
             // Ignore messages that do not start with a command trigger (for now).
             if (!message.startsWith(COMMAND_TRIGGER)) {
@@ -30,6 +38,6 @@ public class TextMessageListener implements MessageListener<DiscordApi> {
                     .forEach(observer -> observer.observe(api, event));
         });
 
-        System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());
+        log.info("You can invite the bot by using the following url: {}", api.createBotInvite());
     }
 }
