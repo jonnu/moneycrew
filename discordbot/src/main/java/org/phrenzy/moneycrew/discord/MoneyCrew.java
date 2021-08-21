@@ -12,10 +12,11 @@ public class MoneyCrew {
 
     public static void main(final String[] args) {
 
-        Injector injector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(
-                new DiscordModule()
-        ));
+        if (args.length == 0) {
+            throw new IllegalStateException("DiscordApi token required, but was not passed.");
+        }
 
+        Injector injector = Guice.createInjector(Stage.PRODUCTION, ImmutableList.of(new DiscordModule()));
         MessageListener<DiscordApi> listener = injector.getInstance(Key.get(new TypeLiteral<MessageListener<DiscordApi>>() {}));
 
         // Read the token from the first program parameter when invoking the bot

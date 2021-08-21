@@ -1,0 +1,4 @@
+plugins {
+    id 'moneycrew.java-common-conventions'
+    id 'java-library'
+}

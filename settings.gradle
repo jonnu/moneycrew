@@ -1,4 +1,2 @@
 rootProject.name = 'moneycrew'
 include 'discordbot'
-findProject(':discordbot')?.name = 'moneycrew.discord'
-
