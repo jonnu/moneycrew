@@ -1,7 +1,11 @@
 package org.phrenzy.moneycrew.discord;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.*;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Stage;
+import com.google.inject.TypeLiteral;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.util.logging.ExceptionLogger;
