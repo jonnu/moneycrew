@@ -1,32 +1,30 @@
 package org.phrenzy.moneycrew.discord.scrim.service;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
-import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
-import org.javacord.api.event.message.reaction.ReactionAddEvent;
-import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
-import org.javacord.api.listener.message.reaction.ReactionAddListener;
-import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
+import org.phrenzy.moneycrew.discord.meta.listener.EmojiRoleReactionAddListener;
+import org.phrenzy.moneycrew.discord.meta.listener.EmojiRoleReactionRemoveListener;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Log4j2
 public class StartupMessageListener implements MessageListener<DiscordApi> {
 
     // todo: make dynamic.
-    private static Map<String, String> EMOJI_ROLE_STRING_MAPPING = ImmutableMap.<String, String>builder()
+    // todo: move to di'd dependency.
+    private static final Map<String, String> EMOJI_ROLE_STRING_MAPPING = ImmutableMap.<String, String>builder()
             .put("jmc_hs", "CS:GO")
             .put("jmc_monster", "ROCKET LEAGUE")
             .put("jmc_malding", "VALORANT")
@@ -37,8 +35,6 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
 
     @Override
     public void bindListeners(final DiscordApi api) {
-
-        log.info("StartupMessageListener bound");
 
         final Collection<Role> roles = api.getRoles();
         api.getCustomEmojis().forEach(emoji -> {
@@ -52,26 +48,40 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
 
         log.info("Mapping Created: {}", emojiToRoleMap);
 
+        // start to build the message.
+        final MessageBuilder builder = new MessageBuilder()
+                .append("Role Administration", MessageDecoration.UNDERLINE)
+                .appendNewLine()
+                .appendNewLine()
+                .append(emojiToRoleMap.entrySet().stream().map(e -> e.getKey().getMentionTag() + " " + e.getValue().getName()).collect(Collectors.joining("\n")))
+                .appendNewLine()
+                .appendNewLine();
+
         // empty the old bois
         api.getChannelById(878719940310499328L)
                 .flatMap(Channel::asTextChannel)
-                .map(x -> x.getMessages(100).thenAccept(MessageSet::deleteAll));
+                .map(x -> x.getMessages(25).thenAccept(messages -> {
 
-        api.getChannelById(878719940310499328L)
-                .flatMap(Channel::asTextChannel)
-                .map(channel -> new MessageBuilder()
-                        .append("Role Administration", MessageDecoration.UNDERLINE)
-                        .appendNewLine()
-                        .appendNewLine()
-                        .append(emojiToRoleMap.entrySet().stream().map(e -> e.getKey().getMentionTag() + " " + e.getValue().getName()).collect(Collectors.joining("\n")))
-                        .appendNewLine()
-                        .appendNewLine()
-                        .send(channel)
-                        .thenAccept(message -> {
-                            message.addReactions(emojiToRoleMap.keySet().toArray(new Emoji[0]));
-                            message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
-                            message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
-                        }));
+                    final Optional<Message> existingMessage = messages.stream()
+                            .filter(message -> message.getContent().trim().equals(builder.getStringBuilder().toString().trim()))
+                            .findFirst();
+
+                    existingMessage.ifPresent(message -> {
+                        log.info("I found an existing post. I'll just clean the others I find.");
+                        messages.stream().filter(m -> !m.equals(message)).forEach(Message::delete);
+                    });
+
+                    if (existingMessage.isEmpty()) {
+                        log.info("I didn't see the message, so I'm going to post it once more.");
+                        messages.getNewestMessage()
+                                .map(Message::getChannel)
+                                .map(channel -> builder.send(channel).thenAccept(message -> {
+                                    message.addReactions(emojiToRoleMap.keySet().toArray(new Emoji[0]));
+                                    message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
+                                    message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
+                                }));
+                    }
+                }));
 
         // Debugging.
         api.addMessageCreateListener(event -> {
@@ -80,9 +90,9 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
             }
         });
 
-        api.addServerBecomesAvailableListener(event -> {
+        api.addServerJoinListener(event -> {
 
-            log.info("ServerBecomesAvailable triggered.");
+            log.info("addServerJoinListener triggered.");
 
             event.getServer()
                     .getTextChannels()
@@ -93,50 +103,4 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
         });
     }
 
-    @AllArgsConstructor
-    class EmojiRoleReactionAddListener implements ReactionAddListener {
-
-        private final long id;
-        private final Map<Emoji, Role> map;
-
-        @Override
-        public void onReactionAdd(final ReactionAddEvent event) {
-
-            if (event.getUser().map(User::isYourself).orElse(false)) {
-                log.info("I will not react to myself.");
-                return;
-            }
-
-            if (event.getMessageId() == id && map.containsKey(event.getEmoji())) {
-                event.requestUser().thenAccept(user -> {
-                    user.addRole(map.get(event.getEmoji()));
-                    log.info("Added role {} to user {}", map.get(event.getEmoji()), user);
-                });
-            }
-        }
-    }
-
-    @AllArgsConstructor
-    class EmojiRoleReactionRemoveListener implements ReactionRemoveListener {
-
-        private final long id;
-        private final Map<Emoji, Role> map;
-
-        @Override
-        public void onReactionRemove(final ReactionRemoveEvent event) {
-
-            if (event.getUser().map(User::isYourself).orElse(false)) {
-                log.info("I will not react to myself.");
-                return;
-            }
-
-            if (event.getMessageId() == id && map.containsKey(event.getEmoji())) {
-                log.info("Removing role {} from user {}", map.get(event.getEmoji()), event.getUser());
-                event.requestUser().thenAccept(user -> {
-                    user.removeRole(map.get(event.getEmoji()));
-                    log.info("Removed role {} from user {}", map.get(event.getEmoji()), user);
-                });
-            }
-        }
-    }
 }

@@ -20,7 +20,7 @@ public class StatusObserver implements MessageEventObserver<DiscordApi> {
     public void observe(final DiscordApi api, final MessageCreateEvent event) {
 
         try {
-            event.getChannel().sendMessage("Host: " + InetAddress.getLocalHost().getHostAddress());
+            event.getChannel().sendMessage("Host: " + InetAddress.getLocalHost().getCanonicalHostName());
         } catch (UnknownHostException exception) {
             log.error("Unable to fetch status", exception);
         }
