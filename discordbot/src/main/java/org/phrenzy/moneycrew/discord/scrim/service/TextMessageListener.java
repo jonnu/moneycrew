@@ -22,11 +22,11 @@ public class TextMessageListener implements MessageListener<DiscordApi> {
             final String message = event.getMessage().getContent().toLowerCase();
 
             if (event.getMessageAuthor().isYourself()) {
-                log.info("message (from self): {}", message);
+                log.debug("message (from self): {}", message);
                 return;
             }
 
-            log.info("message: {}", message);
+            log.debug("message: {}", message);
 
             // Ignore messages that do not start with a command trigger (for now).
             if (!message.startsWith(COMMAND_TRIGGER)) {

@@ -8,6 +8,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.javacord.api.DiscordApi;
 import org.phrenzy.moneycrew.discord.core.observer.ShutdownLifecycleObserver;
 import org.phrenzy.moneycrew.discord.core.observer.StatusObserver;
+import org.phrenzy.moneycrew.discord.core.observer.UptimeObserver;
 import org.phrenzy.moneycrew.discord.faceit.observer.FaceItObserver;
 import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 import org.phrenzy.moneycrew.discord.core.observer.PingObserver;
@@ -26,12 +27,9 @@ public class DiscordModule extends AbstractModule {
     protected void configure() {
         bind(ScrimStorage.class).to(InMemoryScrimStorage.class);
 
-        //bind(new TypeLiteral<MessageListener<DiscordApi>>() {}).to(TextMessageListener.class);
-
         Multibinder<MessageListener<DiscordApi>> listeners = Multibinder.newSetBinder(binder(), new TypeLiteral<MessageListener<DiscordApi>>() {});
         listeners.addBinding().to(TextMessageListener.class);
         listeners.addBinding().to(StartupMessageListener.class);
-
     }
 
     @Provides
@@ -40,6 +38,7 @@ public class DiscordModule extends AbstractModule {
                 new ShutdownLifecycleObserver(),
                 new PingObserver(),
                 new StatusObserver(),
+                new UptimeObserver(),
                 new ScrimObserver(scrimStorage),
                 new FaceItObserver()
         );

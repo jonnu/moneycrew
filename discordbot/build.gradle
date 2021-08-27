@@ -20,7 +20,9 @@ dependencies {
     implementation group: 'com.squareup.okhttp3', name: 'okhttp'
     implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor'
 
+    implementation group: 'org.threeten', name: 'threeten-extra', version: '1.7.0'
     implementation group: 'org.javacord', name: 'javacord', version: '3.3.2'
+
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.14.1'

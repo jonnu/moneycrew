@@ -14,7 +14,6 @@ import org.phrenzy.moneycrew.discord.meta.listener.EmojiRoleReactionRemoveListen
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,25 +81,6 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                                 }));
                     }
                 }));
-
-        // Debugging.
-        api.addMessageCreateListener(event -> {
-            if (event.getMessageContent().toLowerCase().startsWith("!roles")) {
-                event.getChannel().sendMessage(event.getMessage().getUserAuthor().map(x -> new HashSet<>(x.getRoles(event.getServer().orElse(null)))).toString());
-            }
-        });
-
-        api.addServerJoinListener(event -> {
-
-            log.info("addServerJoinListener triggered.");
-
-            event.getServer()
-                    .getTextChannels()
-                    .stream()
-                    .filter(channel -> channel.getName().toLowerCase().contains(api.getYourself().getName().toLowerCase()))
-                    .collect(Collectors.toList())
-                    .forEach(channel -> channel.sendMessage("Hello."));
-        });
     }
 
 }
