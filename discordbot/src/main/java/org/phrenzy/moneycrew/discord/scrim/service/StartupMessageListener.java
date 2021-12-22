@@ -3,6 +3,7 @@ package org.phrenzy.moneycrew.discord.scrim.service;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
@@ -34,6 +35,9 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
 
     @Override
     public void bindListeners(final DiscordApi api) {
+
+        api.unsetActivity();
+        api.updateActivity(ActivityType.WATCHING, "https://github.com/jonnu/moneycrew");
 
         final Collection<Role> roles = api.getRoles();
         api.getCustomEmojis().forEach(emoji -> {
