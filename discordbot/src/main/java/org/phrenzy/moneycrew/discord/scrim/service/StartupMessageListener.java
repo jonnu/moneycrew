@@ -84,27 +84,20 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                             .filter(message -> message.getContent().trim().equals(builder.getStringBuilder().toString().trim()))
                             .findFirst();
 
-                    existingMessage.ifPresent(message -> {
-                        log.info("I found an existing post. I'll just clean the others I find.");
+                    existingMessage.ifPresentOrElse(message -> {
+                        log.info("I found an existing message. I'll just clean the others I find.");
                         messages.stream().filter(m -> !m.equals(message)).forEach(Message::delete);
-                    });
-
-                    if (existingMessage.isEmpty()) {
-                        log.info("I didn't see the message, so I'm going to post it once more.");
+                    }, () -> {
+                        log.info("I didn't see the message, so I'm going to post it.");
                         messages.getNewestMessage()
                                 .map(Message::getChannel)
-                                .map(channel -> builder.send(channel).thenAccept(message -> {
-                                    log.info("Message: {}", message.getContent());
-                                    message.addReactions(emojiToRoleMap.entrySet()
-                                            .stream()
-                                            .sorted(Map.Entry.comparingByValue(Comparator.comparing(Nameable::getName)))
-                                            .map(Map.Entry::getKey)
-                                            .toArray(KnownCustomEmoji[]::new));
-                                    message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
-                                    message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
-                                }).exceptionally(ExceptionLogger.get()));
+                                .or(() -> api.getChannelById(ROLE_CHANNEL_ID)
+                                        .flatMap(Channel::asTextChannel))
+                                .map(channel -> builder.send(channel)
+                                        .thenAccept(this::addEmojiRoleReactListeners)
+                                        .exceptionally(ExceptionLogger.get()));
                         messages.deleteAll();
-                    }
+                    });
                 }));
 
         final MessageBuilder welcomeMessage = new MessageBuilder()
@@ -140,6 +133,16 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                 .flatMap(Channel::asTextChannel)
                 .ifPresent(channel -> welcomeMessage.send(channel)
                         .exceptionally(ExceptionLogger.get()));
+    }
+
+    private void addEmojiRoleReactListeners(final Message message) {
+        message.addReactions(emojiToRoleMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparing(Nameable::getName)))
+                .map(Map.Entry::getKey)
+                .toArray(KnownCustomEmoji[]::new));
+        message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
+        message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
     }
 
     private Optional<Invite> getInviteLink(final DiscordApi api) {
