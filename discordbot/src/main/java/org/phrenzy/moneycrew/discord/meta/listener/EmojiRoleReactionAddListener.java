@@ -20,6 +20,8 @@ public class EmojiRoleReactionAddListener implements ReactionAddListener {
     @Override
     public void onReactionAdd(final ReactionAddEvent event) {
 
+        log.info("Event: {}", event);
+
         event.requestUser().thenAccept(user -> {
             if (user.isYourself()) {
                 log.debug("I will not react to myself.");
