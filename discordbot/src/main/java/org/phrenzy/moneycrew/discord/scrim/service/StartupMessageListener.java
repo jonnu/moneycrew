@@ -31,7 +31,10 @@ import static org.phrenzy.moneycrew.discord.text.StringNormalisation.normalise;
 @Log4j2
 public class StartupMessageListener implements MessageListener<DiscordApi> {
 
-    private static final long CHANNEL_ID = 878719940310499328L;
+    private static final long JMC_SERVER_ID = 474694402732851221L;
+    private static final long ROLE_CHANNEL_ID = 878719940310499328L;
+    private static final long WELCOME_CHANNEL_ID = 474694403156344833L;
+
     private final Map<KnownCustomEmoji, Role> emojiToRoleMap = new HashMap<>();
 
     @Override
@@ -73,7 +76,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                 .append(" ");
 
         // empty the old bois
-        api.getChannelById(CHANNEL_ID)
+        api.getChannelById(ROLE_CHANNEL_ID)
                 .flatMap(Channel::asTextChannel)
                 .map(c -> c.getMessages(25).thenAccept(messages -> {
 
@@ -91,6 +94,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                         messages.getNewestMessage()
                                 .map(Message::getChannel)
                                 .map(channel -> builder.send(channel).thenAccept(message -> {
+                                    log.info("Message: {}", message.getContent());
                                     message.addReactions(emojiToRoleMap.entrySet()
                                             .stream()
                                             .sorted(Map.Entry.comparingByValue(Comparator.comparing(Nameable::getName)))
@@ -98,7 +102,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                                             .toArray(KnownCustomEmoji[]::new));
                                     message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
                                     message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
-                                }));
+                                }).exceptionally(ExceptionLogger.get()));
                         messages.deleteAll();
                     }
                 }));
@@ -126,12 +130,13 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
 
         log.info("Welcome message going...");
 
-        api.getChannelById(474694403156344833L)
+        api.getChannelById(WELCOME_CHANNEL_ID)
                 .flatMap(Channel::asTextChannel)
                 .ifPresent(channel -> channel.getMessages(25)
-                        .thenAccept(MessageSet::deleteAll));
+                        .thenAccept(MessageSet::deleteAll)
+                        .exceptionally(ExceptionLogger.get()));
 
-        api.getChannelById(474694403156344833L)
+        api.getChannelById(WELCOME_CHANNEL_ID)
                 .flatMap(Channel::asTextChannel)
                 .ifPresent(channel -> welcomeMessage.send(channel)
                         .exceptionally(ExceptionLogger.get()));
@@ -140,7 +145,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
     private Optional<Invite> getInviteLink(final DiscordApi api) {
         CompletableFuture<Invite> inviteFuture = new CompletableFuture<>();
 
-        api.getServerById(474694402732851221L)
+        api.getServerById(JMC_SERVER_ID)
                 .ifPresent(server -> server.getInvites()
                         .thenAccept(col -> col.stream()
                                 .findFirst()
