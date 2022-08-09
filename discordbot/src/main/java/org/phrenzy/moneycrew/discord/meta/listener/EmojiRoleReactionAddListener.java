@@ -19,15 +19,17 @@ public class EmojiRoleReactionAddListener implements ReactionAddListener {
 
     @Override
     public void onReactionAdd(final ReactionAddEvent event) {
+
         event.requestUser().thenAccept(user -> {
             if (user.isYourself()) {
-                log.info("I will not react to myself.");
+                log.debug("I will not react to myself.");
                 return;
             }
 
             event.requestMessage().thenAccept(message -> {
                 if (message.getId() == id) {
-                    Optional.ofNullable(map.get(event.getEmoji()))
+                    log.info("Granting {} to {}", map.get((KnownCustomEmoji) event.getEmoji()), user.getName());
+                    Optional.ofNullable(map.get((KnownCustomEmoji) event.getEmoji()))
                             .ifPresent(user::addRole);
                 }
             });

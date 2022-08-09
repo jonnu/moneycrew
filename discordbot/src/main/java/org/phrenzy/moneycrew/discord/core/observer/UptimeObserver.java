@@ -2,7 +2,6 @@ package org.phrenzy.moneycrew.discord.core.observer;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 import org.threeten.extra.AmountFormats;
 
 import java.time.Duration;

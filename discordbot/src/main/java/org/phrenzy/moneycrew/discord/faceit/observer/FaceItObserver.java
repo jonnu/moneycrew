@@ -10,10 +10,11 @@ import okhttp3.Response;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.phrenzy.moneycrew.discord.faceit.model.Player;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
+import org.phrenzy.moneycrew.discord.core.observer.MessageEventObserver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -51,7 +52,7 @@ public class FaceItObserver implements MessageEventObserver<DiscordApi> {
 
             if (response.isSuccessful()) {
 
-                log.info("Successful ({}) API call to: {}", response.code(), response.request().url().toString());
+                log.info("Successful ({}) API call to: {}", response.code(), response.request().url());
 
                 Player player = Optional.ofNullable(response.body())
                         .map(body -> safelyMapStreamToClass(body.byteStream(), Player.class))
@@ -63,14 +64,15 @@ public class FaceItObserver implements MessageEventObserver<DiscordApi> {
                     return;
                 }
 
-                event.getChannel().sendMessage(String.format("%s (faceit level: %s, faceit ELO: %s)",
+                event.getChannel().sendMessage(String.format("%s :flag_%s: (faceit level: %d, faceit ELO: %s)",
                         player.getNickname(),
-                        player.getGames().get("csgo").getSkillLevelLabel(),
+                        player.getCountry().toLowerCase(Locale.getDefault()),
+                        player.getGames().get("csgo").getSkillLevel(),
                         player.getGames().get("csgo").getFaceitElo())
                 );
             }
             else {
-                log.info("failed: {}", response.code());
+                log.info("failed: {} {}", response.code(), response.message());
             }
         }
         catch (Exception e) {

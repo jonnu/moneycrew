@@ -1,11 +1,11 @@
 plugins {
     id 'moneycrew.java-application-conventions'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'io.freefair.lombok' version '6.1.0'
 }
 
 application {
-    mainClass = 'org.phrenzy.moneycrew.discord.MoneyCrew'
+    mainClass.set('org.phrenzy.moneycrew.discord.MoneyCrew')
 }
 
 group 'org.phrenzy'
@@ -13,22 +13,22 @@ version '1.0-SNAPSHOT'
 
 dependencies {
 
-    implementation(platform('com.google.inject:guice-bom:5.0.1'))
-    implementation(platform('com.squareup.okhttp3:okhttp-bom:4.9.1'))
+    implementation(platform('com.google.inject:guice-bom:5.1.0'))
+    implementation(platform('com.squareup.okhttp3:okhttp-bom:4.10.0'))
 
     implementation group: 'com.google.inject', name: 'guice'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp'
     implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor'
 
-    implementation group: 'org.threeten', name: 'threeten-extra', version: '1.7.0'
-    implementation group: 'org.javacord', name: 'javacord', version: '3.3.2'
+    implementation group: 'org.threeten', name: 'threeten-extra', version: '1.7.1'
+    implementation group: 'org.javacord', name: 'javacord', version: '3.5.0'
 
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.14.1'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.18.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.18.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.18.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
 
-    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.15.0'
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.18.0'
 }
 
 shadowJar {

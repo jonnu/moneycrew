@@ -10,7 +10,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.util.logging.ExceptionLogger;
 import org.phrenzy.moneycrew.discord.di.DiscordModule;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageListener;
+import org.phrenzy.moneycrew.discord.core.listener.MessageListener;
 
 import java.util.Arrays;
 import java.util.Optional;

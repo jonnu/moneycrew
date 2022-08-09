@@ -10,12 +10,12 @@ import org.phrenzy.moneycrew.discord.core.observer.ShutdownLifecycleObserver;
 import org.phrenzy.moneycrew.discord.core.observer.StatusObserver;
 import org.phrenzy.moneycrew.discord.core.observer.UptimeObserver;
 import org.phrenzy.moneycrew.discord.faceit.observer.FaceItObserver;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
+import org.phrenzy.moneycrew.discord.core.observer.MessageEventObserver;
 import org.phrenzy.moneycrew.discord.core.observer.PingObserver;
 import org.phrenzy.moneycrew.discord.scrim.observer.ScrimObserver;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageListener;
+import org.phrenzy.moneycrew.discord.core.listener.MessageListener;
 import org.phrenzy.moneycrew.discord.scrim.service.StartupMessageListener;
-import org.phrenzy.moneycrew.discord.scrim.service.TextMessageListener;
+import org.phrenzy.moneycrew.discord.core.listener.TextMessageListener;
 import org.phrenzy.moneycrew.discord.scrim.storage.InMemoryScrimStorage;
 import org.phrenzy.moneycrew.discord.scrim.storage.ScrimStorage;
 

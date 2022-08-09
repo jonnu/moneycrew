@@ -2,7 +2,6 @@ package org.phrenzy.moneycrew.discord.core.observer;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 
 public class ShutdownLifecycleObserver implements MessageEventObserver<DiscordApi> {
 

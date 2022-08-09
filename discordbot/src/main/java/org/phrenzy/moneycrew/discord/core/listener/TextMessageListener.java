@@ -1,9 +1,10 @@
-package org.phrenzy.moneycrew.discord.scrim.service;
+package org.phrenzy.moneycrew.discord.core.listener;
 
 import com.google.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
+import org.phrenzy.moneycrew.discord.core.observer.MessageEventObserver;
 
 import java.util.Set;
 
@@ -26,12 +27,12 @@ public class TextMessageListener implements MessageListener<DiscordApi> {
                 return;
             }
 
-            log.debug("message: {}", message);
-
             // Ignore messages that do not start with a command trigger (for now).
             if (!message.startsWith(COMMAND_TRIGGER)) {
                 return;
             }
+
+            log.info("received command: {}", message);
 
             observers.stream()
                     .filter(observer -> observer.canHandle(message))

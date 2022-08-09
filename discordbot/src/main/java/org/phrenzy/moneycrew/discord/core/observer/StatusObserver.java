@@ -3,7 +3,6 @@ package org.phrenzy.moneycrew.discord.core.observer;
 import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

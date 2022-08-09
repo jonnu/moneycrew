@@ -1,4 +1,4 @@
-package org.phrenzy.moneycrew.discord.scrim.service;
+package org.phrenzy.moneycrew.discord.core.observer;
 
 import org.javacord.api.event.message.MessageCreateEvent;
 

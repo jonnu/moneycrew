@@ -3,7 +3,6 @@ package org.phrenzy.moneycrew.discord.core.observer;
 import com.google.inject.Inject;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
 
 public class PingObserver implements MessageEventObserver<DiscordApi> {
 

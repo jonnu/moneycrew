@@ -7,7 +7,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.phrenzy.moneycrew.discord.scrim.service.MessageEventObserver;
+import org.phrenzy.moneycrew.discord.core.observer.MessageEventObserver;
 import org.phrenzy.moneycrew.discord.scrim.model.Scrim;
 import org.phrenzy.moneycrew.discord.scrim.storage.ScrimStorage;
 

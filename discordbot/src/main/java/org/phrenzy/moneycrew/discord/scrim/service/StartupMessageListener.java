@@ -1,6 +1,5 @@
 package org.phrenzy.moneycrew.discord.scrim.service;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.log4j.Log4j2;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Nameable;
@@ -14,32 +13,25 @@ import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.util.logging.ExceptionLogger;
+import org.phrenzy.moneycrew.discord.core.listener.MessageListener;
 import org.phrenzy.moneycrew.discord.meta.listener.EmojiRoleReactionAddListener;
 import org.phrenzy.moneycrew.discord.meta.listener.EmojiRoleReactionRemoveListener;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.phrenzy.moneycrew.discord.text.StringNormalisation.normalise;
 
 @Log4j2
 public class StartupMessageListener implements MessageListener<DiscordApi> {
 
     private static final long CHANNEL_ID = 878719940310499328L;
-
-    // todo: make dynamic.
-    // todo: move to di'd dependency.
-    private static final Map<String, String> EMOJI_ROLE_STRING_MAPPING = ImmutableMap.<String, String>builder()
-            .put("jmc_csgo", "CS:GO")
-            .put("jmc_rocketleague", "Rocket League")
-            .put("jmc_valorant", "Valorant")
-            .put("jmc_valheim", "Valheim")
-            .build();
-
     private final Map<KnownCustomEmoji, Role> emojiToRoleMap = new HashMap<>();
 
     @Override
@@ -48,17 +40,20 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
         api.unsetActivity();
         api.updateActivity(ActivityType.WATCHING, "https://github.com/jonnu/moneycrew");
 
-        final Collection<Role> roles = api.getRoles();
-        api.getCustomEmojis().forEach(emoji -> {
-            if (EMOJI_ROLE_STRING_MAPPING.containsKey(emoji.getName())) {
-                roles.stream()
-                        .filter(role -> role.getName().toLowerCase().contains(EMOJI_ROLE_STRING_MAPPING.get(emoji.getName()).toLowerCase()))
-                        .findFirst()
-                        .ifPresent(role -> emojiToRoleMap.put(emoji, role));
-            }
-        });
+        final Map<String, Role> sanitisedRoles = api.getRoles().stream()
+                .collect(Collectors.toMap(role -> normalise(role.getName()), Function.identity()));
 
-        log.info("Mapping Created: {}", emojiToRoleMap);
+        final Map<String, KnownCustomEmoji> sanitisedEmoji = api.getCustomEmojis().stream()
+                .filter(emoji -> !emoji.isAnimated())
+                .collect(Collectors.toMap(emoji -> normalise(emoji.getName()), Function.identity()));
+
+        sanitisedEmoji.entrySet()
+                .stream()
+                .filter(ent -> sanitisedRoles.containsKey(ent.getKey()))
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(emoji -> emojiToRoleMap.put(emoji.getValue(), sanitisedRoles.get(emoji.getKey())));
+
+        emojiToRoleMap.forEach((emoji, role) -> log.info("Bound {} --> {}", emoji.getName(), role.getName()));
 
         // start to build the message.
         final MessageBuilder builder = new MessageBuilder()
@@ -80,7 +75,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
         // empty the old bois
         api.getChannelById(CHANNEL_ID)
                 .flatMap(Channel::asTextChannel)
-                .map(x -> x.getMessages(25).thenAccept(messages -> {
+                .map(c -> c.getMessages(25).thenAccept(messages -> {
 
                     final Optional<Message> existingMessage = messages.stream()
                             .filter(message -> message.getContent().trim().equals(builder.getStringBuilder().toString().trim()))
@@ -96,7 +91,11 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                         messages.getNewestMessage()
                                 .map(Message::getChannel)
                                 .map(channel -> builder.send(channel).thenAccept(message -> {
-                                    message.addReactions(emojiToRoleMap.keySet().toArray(new KnownCustomEmoji[0]));
+                                    message.addReactions(emojiToRoleMap.entrySet()
+                                            .stream()
+                                            .sorted(Map.Entry.comparingByValue(Comparator.comparing(Nameable::getName)))
+                                            .map(Map.Entry::getKey)
+                                            .toArray(KnownCustomEmoji[]::new));
                                     message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
                                     message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
                                 }));
@@ -138,7 +137,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                         .exceptionally(ExceptionLogger.get()));
     }
 
-    private Optional<Invite> getInviteLink(DiscordApi api) {
+    private Optional<Invite> getInviteLink(final DiscordApi api) {
         CompletableFuture<Invite> inviteFuture = new CompletableFuture<>();
 
         api.getServerById(474694402732851221L)
@@ -153,7 +152,8 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
     private static String convertEmojiToMessageLine(final KnownCustomEmoji emoji) {
         return new StringJoiner(" → ")
                 .add(emoji.getMentionTag())
-                .add(EMOJI_ROLE_STRING_MAPPING.get(emoji.getName())).toString();
+                .add(normalise(emoji.getName()))
+                .toString();
     }
 
 }
