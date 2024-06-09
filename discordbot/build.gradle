@@ -13,15 +13,15 @@ version '1.0-SNAPSHOT'
 
 dependencies {
 
-    implementation(platform('com.google.inject:guice-bom:5.1.0'))
-    implementation(platform('com.squareup.okhttp3:okhttp-bom:4.10.0'))
+    implementation(platform('com.google.inject:guice-bom:7.0.0'))
+    implementation(platform('com.squareup.okhttp3:okhttp-bom:4.12.0'))
 
     implementation group: 'com.google.inject', name: 'guice'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp'
     implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor'
 
     implementation group: 'org.threeten', name: 'threeten-extra', version: '1.7.1'
-    implementation group: 'org.javacord', name: 'javacord', version: '3.5.0'
+    implementation group: 'org.javacord', name: 'javacord', version: '3.8.0'
 
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.18.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.18.0'

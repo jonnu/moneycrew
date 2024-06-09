@@ -87,6 +87,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                     existingMessage.ifPresentOrElse(message -> {
                         log.info("I found an existing message. I'll just clean the others I find.");
                         messages.stream().filter(m -> !m.equals(message)).forEach(Message::delete);
+                        addEmojiRoleReactListeners(message);
                     }, () -> {
                         log.info("I didn't see the message, so I'm going to post it.");
                         messages.getNewestMessage()
@@ -143,6 +144,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
                 .toArray(KnownCustomEmoji[]::new));
         message.addReactionAddListener(new EmojiRoleReactionAddListener(message.getId(), emojiToRoleMap));
         message.addReactionRemoveListener(new EmojiRoleReactionRemoveListener(message.getId(), emojiToRoleMap));
+        log.info("Bound emoji reaction listener(s) to {} emojis", emojiToRoleMap.size());
     }
 
     private Optional<Invite> getInviteLink(final DiscordApi api) {
@@ -158,7 +160,7 @@ public class StartupMessageListener implements MessageListener<DiscordApi> {
     }
 
     private static String convertEmojiToMessageLine(final KnownCustomEmoji emoji) {
-        return new StringJoiner(" → ")
+        return new StringJoiner(" \u2192 ")
                 .add(emoji.getMentionTag())
                 .add(normalise(emoji.getName()))
                 .toString();

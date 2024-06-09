@@ -8,9 +8,10 @@ import com.google.inject.Stage;
 import com.google.inject.TypeLiteral;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.util.logging.ExceptionLogger;
-import org.phrenzy.moneycrew.discord.di.DiscordModule;
 import org.phrenzy.moneycrew.discord.core.listener.MessageListener;
+import org.phrenzy.moneycrew.discord.di.DiscordModule;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -33,6 +34,7 @@ public class MoneyCrew {
 
         new DiscordApiBuilder()
                 .setToken(token)
+                .addIntents(Intent.MESSAGE_CONTENT)
                 .login()
                 .thenAccept(api -> listeners.forEach(listener -> listener.bindListeners(api)))
                 .exceptionally(ExceptionLogger.get());

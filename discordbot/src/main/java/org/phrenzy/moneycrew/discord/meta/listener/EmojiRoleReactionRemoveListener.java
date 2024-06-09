@@ -20,8 +20,6 @@ public class EmojiRoleReactionRemoveListener implements ReactionRemoveListener {
     @Override
     public void onReactionRemove(final ReactionRemoveEvent event) {
 
-        log.info("Event: {}", event);
-
         event.requestUser().thenAccept(user -> {
             if (user.isYourself()) {
                 log.debug("I will not react to myself.");
